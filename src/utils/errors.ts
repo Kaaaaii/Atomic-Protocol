@@ -6,6 +6,7 @@ export type ErrorCode =
     | "INVALID_REALM"
     | "INVITE_FAILED"
     | "INVALID_PROTOCOL"
+    | "UNSUPPORTED_PROTOCOL"
 
 export class AtomicError extends Error {
     readonly code: ErrorCode;
@@ -35,5 +36,8 @@ export const Errors = {
     },
     invalidProtocol(current: number | undefined) {
         return new AtomicError("INVALID_PROTOCOL", `Unsupported protocol version: ${current}. (Supported ${config.protocol})`)
+    },
+    unsupportedProtocol() {
+        return new AtomicError("UNSUPPORTED_PROTOCOL", `Unsupported protocol: "NETHERNET".`)
     }
 };

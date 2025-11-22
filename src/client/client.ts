@@ -5,13 +5,6 @@ import { Events } from '../Events';
 import { keyExchange } from "../handshake/keyExchange";
 import login from "../handshake/login";
 import loginVerify from "../handshake/loginVerify";
-import { NethernetClient } from "../nethernet";
-import type { InputFlag } from "../packets/InputFlag";
-import type { ClientMovementPredictionSyncPacket } from "../packets/packet_client_movement_prediction_sync";
-import type { MovePlayerPacket } from "../packets/packet_move_player";
-import type { NetworkStackLatencyPacket } from "../packets/packet_network_stack_latency";
-import type { StartGamePacket } from "../packets/packet_start_game";
-import type { TickSyncPacket } from "../packets/packet_tick_sync";
 import { RaknetClient } from "../rak";
 import { createDeserializer, createSerializer } from "../transforms/serializer";
 import { ClientOptions, clientStatus } from "../types";
@@ -21,7 +14,7 @@ import { Connection } from "./connection";
 import { Errors } from "../utils/errors";
 
 export class Client extends Connection {
-    connection!: RaknetClient | NethernetClient;
+    connection!: RaknetClient;
 
     public features: any;
     public options: ClientOptions;
@@ -36,20 +29,6 @@ export class Client extends Connection {
     public accessToken!: string;
     public clientIdentityChain!: string;
     public clientUserChain!: string;
-    public nethernet: any;
-
-    public start: number = Date.now();
-    public end: number = Date.now();
-    public difference: number = 0;
-
-    private reconnectTimer: NodeJS.Timeout | null = null;
-    private reconnectAttempts = 0;
-    private manualDisconnect = false;
-    private autoReconnect: boolean;
-    private authInputInterval: NodeJS.Timeout | null = null;
-    private currentPosition: { x: number; y: number; z: number; } | null = null;
-    private currentRotation: { pitch: number; yaw: number; headYaw: number; } | null = null;
-    private selfRuntimeId: number | null = null;
 
     override on<K extends keyof Events>(event: K, listener: Events[K]): this {
         return super.on(event, listener);
@@ -66,17 +45,6 @@ export class Client extends Connection {
         this.startGameData = {};
         this.clientRuntimeId = null;
         this.viewDistance = options.viewDistance ?? 10;
-        this.autoReconnect = options.autoReconnect ?? (options.transport === "nethernet");
-
-        if (this.options.transport === "nethernet") {
-            this.nethernet = {};
-        }
-
-        this.on('tick_sync', this.handleTickSyncPacket);
-        this.on('network_stack_latency', this.handleNetworkStackLatencyPacket);
-        this.on('start_game', this.handleStartGamePacket);
-        this.on('move_player', this.handleMovePlayerPacket);
-        this.on('client_movement_prediction_sync', this.handleClientMovementPredictionSyncPacket);
 
         if (!options.delayedInit) {
             this.init();
@@ -100,23 +68,15 @@ export class Client extends Connection {
 
     public disconnect(reason: string, hide: any = false) {
         if (this.status === clientStatus.Disconnected) return;
-        this.manualDisconnect = true;
-        this.clearReconnectTimer();
         this.write('disconnect', {
             hide_disconnect_screen: hide,
             message: reason,
             filtered_message: ''
         });
-        this.close(true);
+        this.close();
     };
 
-    public close(manual: boolean = true) {
-        if (manual) {
-            this.manualDisconnect = true;
-            this.autoReconnect = false;
-        }
-        this.stopAuthInputLoop();
-        this.clearReconnectTimer();
+    public close() {
         if (this.status !== clientStatus.Disconnected) this.emit('close');
         clearInterval(this.loop);
         clearTimeout(this.connectTimeout);
@@ -127,18 +87,6 @@ export class Client extends Connection {
     };
 
     public init() {
-        this.manualDisconnect = false;
-        this.clearReconnectTimer();
-        this.stopAuthInputLoop();
-        this.currentPosition = null;
-        this.currentRotation = null;
-        this.selfRuntimeId = null;
-        this.tick = 0n;
-        if (this.options.autoReconnect !== undefined) {
-            this.autoReconnect = this.options.autoReconnect;
-        } else if (this.options.transport === "nethernet") {
-            this.autoReconnect = true;
-        }
         if (this.options.protocolVersion !== config.protocol) throw Errors.invalidProtocol(this.options.protocolVersion)
         this.serializer = createSerializer();
         this.deserializer = createDeserializer();
@@ -151,16 +99,12 @@ export class Client extends Connection {
         const port = this.options.port;
 
         const networkId = this.options.networkId;
+        if (networkId) throw Errors.unsupportedProtocol();
 
-        if (this.options.transport === 'nethernet') {
-            this.connection = new NethernetClient({ networkId });
-            this.batchHeader = null;
-            this.disableEncryption = true;
-        } else if (this.options.transport === 'raknet') {
-            this.connection = new RaknetClient({ useWorkers: true, host, port });
-            this.batchHeader = 0xfe;
-            this.disableEncryption = false;
-        }
+        this.connection = new RaknetClient({ useWorkers: true, host, port });
+        this.batchHeader = 0xfe;
+        this.disableEncryption = false;
+
 
         this.emit('connect_allowed');
     };
@@ -184,7 +128,6 @@ export class Client extends Connection {
                 this.emit('client.server_handshake', des.data.params);
                 break;
             case "network_settings":
-                this.start = Date.now();
                 this.compressionAlgorithm = packet.compression_algorithm || 'deflate';
                 this.compressionThreshold = packet.compression_threshold;
                 this.compressionReady = true;
@@ -207,8 +150,6 @@ export class Client extends Connection {
                 break;
             case 'play_status':
                 if (this.status === clientStatus.Authenticating) {
-                    this.end = Date.now();
-                    this.difference = this.end - this.start;
                     this.emit('join');
                     this.setStatus(clientStatus.Initializing);
                 }
@@ -238,20 +179,11 @@ export class Client extends Connection {
 
     _connect = async () => {
         this.connection.onConnected = () => {
-            this.reconnectAttempts = 0;
-            this.manualDisconnect = false;
             this.setStatus(clientStatus.Connecting);
             this.queue('request_network_settings', { client_protocol: Number(config.protocol) });
         };
         this.connection.onCloseConnection = (reason: any) => {
             Logger.debug(`Server closed connection: ${reason}`, this.status === clientStatus.Disconnected && config.debug);
-            const wasManual = this.manualDisconnect;
-            this.close(wasManual);
-            // if (!wasManual && this.autoReconnect) {
-            //     const delay = Math.min(30000, 2000 * Math.max(1, ++this.reconnectAttempts));
-            //     Logger.debug(`Scheduling Nethernet reconnect in ${delay}ms`);
-            //     this.scheduleReconnect(delay);
-            // }
         };
 
         this.connection.onEncapsulated = this.onEncapsulated;
@@ -294,7 +226,7 @@ export class Client extends Connection {
 
     onDisconnectRequest(packet: any) {
         this.emit('kick', packet);
-        this.close(true);
+        this.close();
     };
 
     onPlayStatus(statusPacket: { status: string; }) {
@@ -302,164 +234,6 @@ export class Client extends Connection {
             this.setStatus(clientStatus.Initialized);
             if (this.entityId) this.on('start_game', () => this.write('set_local_player_as_initialized', { runtime_entity_id: this.entityId }));
             else this.write('set_local_player_as_initialized', { runtime_entity_id: this.entityId });
-            this.startAuthInputLoop();
         };
     };
-
-    private scheduleReconnect(delay: number) {
-        if (this.reconnectTimer || this.manualDisconnect || !this.autoReconnect) return;
-        this.reconnectTimer = setTimeout(() => {
-            this.reconnectTimer = null;
-            if (this.manualDisconnect) return;
-            try {
-                Logger.debug(`Attempting Nethernet reconnect (attempt ${this.reconnectAttempts})`, config.debug);
-                this.init();
-            } catch (err) {
-                this.emit('error', err as Error);
-                const nextDelay = Math.min(30000, delay * 2);
-                this.scheduleReconnect(nextDelay);
-            }
-        }, delay);
-    }
-
-    private clearReconnectTimer() {
-        if (this.reconnectTimer) {
-            clearTimeout(this.reconnectTimer);
-            this.reconnectTimer = null;
-        }
-    }
-
-    private handleTickSyncPacket = (packet: TickSyncPacket) => {
-        this.queue('tick_sync', {
-            request_time: packet.request_time,
-            response_time: Date.now()
-        });
-    };
-
-    private handleNetworkStackLatencyPacket = (packet: NetworkStackLatencyPacket) => {
-        if (packet.needs_response) {
-            this.queue('network_stack_latency', {
-                timestamp: packet.timestamp,
-                needs_response: 0
-            });
-        }
-    };
-
-    private handleStartGamePacket = (packet: StartGamePacket) => {
-        this.selfRuntimeId = this.extractRuntimeId(packet.runtime_entity_id);
-        this.currentPosition = {
-            x: packet.player_position.x,
-            y: packet.player_position.y,
-            z: packet.player_position.z
-        };
-        this.currentRotation = {
-            pitch: packet.rotation.x,
-            yaw: (packet.rotation as any).y,
-            headYaw: (packet.rotation as any).y
-        };
-        if (typeof packet.current_tick === "number") {
-            this.tick = BigInt(packet.current_tick);
-        } else {
-            this.tick = 0n;
-        }
-    };
-
-    private handleMovePlayerPacket = (packet: MovePlayerPacket) => {
-        if (this.selfRuntimeId === null) return;
-        const runtimeId = this.extractRuntimeId((packet as any).runtime_id ?? (packet as any).runtime_entity_id);
-        if (runtimeId === null || runtimeId !== this.selfRuntimeId) return;
-        this.currentPosition = {
-            x: packet.position.x,
-            y: packet.position.y,
-            z: packet.position.z
-        };
-        this.currentRotation = {
-            pitch: packet.pitch,
-            yaw: packet.yaw,
-            headYaw: packet.head_yaw
-        };
-        if ((packet as any).mode === 'teleport') {
-            this.sendPlayerState({ handled_teleport: true });
-        }
-    };
-
-    private handleClientMovementPredictionSyncPacket = (packet: ClientMovementPredictionSyncPacket) => {
-        const runtime = this.extractRuntimeId((packet as any).entity_runtime_id);
-        if (runtime !== null) {
-            this.selfRuntimeId = runtime;
-        }
-        this.sendPlayerState({ received_server_data: true });
-    };
-
-    private extractRuntimeId(value: any): number | null {
-        if (value === undefined || value === null) return null;
-        if (typeof value === "number") return value;
-        if (typeof value === "bigint") return Number(value);
-        if (typeof value === "object") {
-            if (typeof value.low === "number" && typeof value.high === "number") {
-                return Number((BigInt(value.high >>> 0) << 32n) | BigInt(value.low >>> 0));
-            }
-            if ("value" in value) {
-                return this.extractRuntimeId((value as any).value);
-            }
-        }
-        const numeric = Number(value);
-        return Number.isNaN(numeric) ? null : numeric;
-    }
-
-    private startAuthInputLoop() {
-        if (this.authInputInterval) return;
-        this.authInputInterval = setInterval(() => this.sendIdlePlayerInput(), 100);
-    }
-
-    private stopAuthInputLoop() {
-        if (this.authInputInterval) {
-            clearInterval(this.authInputInterval);
-            this.authInputInterval = null;
-        }
-    }
-
-    private sendIdlePlayerInput() {
-        this.sendPlayerState();
-    }
-
-    private sendPlayerState(flags: Partial<InputFlag> = {}) {
-        if (this.status !== clientStatus.Initialized) return;
-        if (!this.currentPosition || !this.currentRotation) return;
-
-        const tickValue = this.tick;
-        this.tick += 1n;
-
-        const yaw = this.currentRotation.yaw ?? 0;
-        const pitch = this.currentRotation.pitch ?? 0;
-        const headYaw = this.currentRotation.headYaw ?? yaw;
-
-        const zeroVec2 = { x: 0, y: 0 };
-        const zeroVec3 = { x: 0, y: 0, z: 0 };
-
-        this.queue('player_auth_input', {
-            pitch,
-            yaw,
-            position: { ...this.currentPosition },
-            move_vector: zeroVec2,
-            head_yaw: headYaw,
-            input_data: { ...config.inputFlags, ...flags },
-            input_mode: 'mouse',
-            play_mode: 'normal',
-            interaction_model: 'classic',
-            interact_rotation: { x: pitch, y: yaw },
-            tick: tickValue,
-            delta: zeroVec3,
-            analogue_move_vector: zeroVec2,
-            camera_orientation: { x: pitch, y: yaw, z: 0 },
-            raw_move_vector: zeroVec2
-        });
-
-        this.queue('player_input', {
-            motion_x: 0,
-            motion_z: 0,
-            jumping: Boolean(flags.start_jumping || flags.jump_pressed_raw || flags.jump_current_raw),
-            sneaking: Boolean(flags.sneaking || flags.sneak_current_raw)
-        });
-    }
 };

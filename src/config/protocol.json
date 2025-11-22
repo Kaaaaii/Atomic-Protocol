@@ -4740,6 +4740,62 @@
         }
       ]
     ],
+    "CameraRotationOption": [
+      "container",
+      [
+        {
+          "name": "value",
+          "type": "vec3f"
+        },
+        {
+          "name": "time",
+          "type": "lf32"
+        }
+      ]
+    ],
+    "CameraSplineInstruction": [
+      "container",
+      [
+        {
+          "name": "total_time",
+          "type": "lf32"
+        },
+        {
+          "name": "ease_type",
+          "type": "CameraSplineEaseType"
+        },
+        {
+          "name": "curve",
+          "type": [
+            "array",
+            {
+              "countType": "varint",
+              "type": "vec3f"
+            }
+          ]
+        },
+        {
+          "name": "progress_key_frames",
+          "type": [
+            "array",
+            {
+              "countType": "varint",
+              "type": "vec2f"
+            }
+          ]
+        },
+        {
+          "name": "rotation_options",
+          "type": [
+            "array",
+            {
+              "countType": "varint",
+              "type": "CameraRotationOption"
+            }
+          ]
+        }
+      ]
+    ],
     "DisconnectFailReason": [
       "mapper",
       {
@@ -4866,9 +4922,7 @@
           "118": "async_join_task_denied",
           "119": "realms_timeline_required",
           "120": "guest_withough_host",
-          "121": "failed_to_join_experience",
-          "122": "discovery_environment_mismatch",
-          "123": "host_without_keys"
+          "121": "failed_to_join_experience"
         }
       }
     ],
@@ -5070,10 +5124,16 @@
           ]
         },
         {
-          "name": "replacement_data",
+          "name": "replacements_data",
           "type": [
             "option",
-            "BiomeReplacementData"
+            [
+              "array",
+              {
+                "countType": "varint",
+                "type": "BiomeReplacementData"
+              }
+            ]
           ]
         }
       ]
@@ -5515,6 +5575,29 @@
         }
       ]
     ],
+    "BiomeConditionalTransformation": [
+      "container",
+      [
+        {
+          "name": "weighted_biomes",
+          "type": [
+            "array",
+            {
+              "countType": "varint",
+              "type": "BiomeWeight"
+            }
+          ]
+        },
+        {
+          "name": "condition_json",
+          "type": "li16"
+        },
+        {
+          "name": "min_passing_neighbours",
+          "type": "lu32"
+        }
+      ]
+    ],
     "BiomeReplacementData": [
       "container",
       [
@@ -5546,29 +5629,6 @@
         },
         {
           "name": "replacement_index",
-          "type": "li32"
-        }
-      ]
-    ],
-    "BiomeConditionalTransformation": [
-      "container",
-      [
-        {
-          "name": "weighted_biomes",
-          "type": [
-            "array",
-            {
-              "countType": "varint",
-              "type": "BiomeWeight"
-            }
-          ]
-        },
-        {
-          "name": "condition_json",
-          "type": "li16"
-        },
-        {
-          "name": "min_passing_neighbours",
           "type": "lu32"
         }
       ]
@@ -5613,16 +5673,7 @@
         }
       }
     ],
-    "GraphicsOverrideParameterType": [
-      "mapper",
-      {
-        "type": "u8",
-        "mappings": {
-          "0": "sky_zenith_color"
-        }
-      }
-    ],
-    "CameraSplineType": [
+    "CameraSplineEaseType": [
       "mapper",
       {
         "type": "u8",
@@ -5632,70 +5683,27 @@
         }
       }
     ],
-    "CameraSplineRotationOption": [
+    "ParameterKeyframeValue": [
       "container",
       [
         {
-          "name": "key_frame_values",
+          "name": "time",
+          "type": "lf32"
+        },
+        {
+          "name": "value",
           "type": "vec3f"
-        },
-        {
-          "name": "key_frame_times",
-          "type": "lf32"
         }
       ]
     ],
-    "CameraSplineInstruction": [
-      "container",
-      [
-        {
-          "name": "total_time",
-          "type": "lf32"
-        },
-        {
-          "name": "type",
-          "type": "CameraSplineType"
-        },
-        {
-          "name": "curve",
-          "type": [
-            "array",
-            {
-              "countType": "varint",
-              "type": "vec3f"
-            }
-          ]
-        },
-        {
-          "name": "progress_key_frames",
-          "type": [
-            "array",
-            {
-              "countType": "varint",
-              "type": "vec2f"
-            }
-          ]
-        },
-        {
-          "name": "rotation_option",
-          "type": [
-            "array",
-            {
-              "countType": "varint",
-              "type": "CameraSplineRotationOption"
-            }
-          ]
+    "GraphicsOverrideParameterType": [
+      "mapper",
+      {
+        "type": "u8",
+        "mappings": {
+          "0": "sky_zenith_color"
         }
-      ]
-    ],
-    "CameraAttachToEntityInstruction": [
-      "container",
-      [
-        {
-          "name": "unique_entity_id",
-          "type": "li64"
-        }
-      ]
+      }
     ],
     "mcpe_packet": [
       "container",
@@ -5930,7 +5938,7 @@
                 "327": "clientbound_controls_scheme",
                 "328": "server_script_debug_drawer",
                 "329": "serverbound_pack_setting_change",
-                "331": "graphics_parameter_override"
+                "331": "graphics_override_parameter"
               }
             }
           ]
@@ -6165,7 +6173,7 @@
                 "clientbound_controls_scheme": "packet_clientbound_controls_scheme",
                 "server_script_debug_drawer": "packet_server_script_debug_drawer",
                 "serverbound_pack_setting_change": "packet_serverbound_pack_setting_change",
-                "graphics_parameter_override": "packet_graphics_parameter_override"
+                "graphics_override_parameter": "packet_graphics_override_parameter"
               }
             }
           ]
@@ -7699,7 +7707,7 @@
                 "76": "grow_up",
                 "77": "vibration_detected",
                 "78": "drink_milk",
-                "79": "shake_wetness_stop"
+                "79": "wetness_stop"
               }
             }
           ]
@@ -8081,7 +8089,7 @@
                   "container",
                   [
                     {
-                      "name": "boat_rowing_time",
+                      "name": "rowing_time",
                       "type": "lf32"
                     }
                   ]
@@ -8090,7 +8098,7 @@
                   "container",
                   [
                     {
-                      "name": "boat_rowing_time",
+                      "name": "rowing_time",
                       "type": "lf32"
                     }
                   ]
@@ -9902,7 +9910,7 @@
       "container",
       [
         {
-          "name": "offer_id",
+          "name": "offer_uuid",
           "type": "uuid"
         },
         {
@@ -13213,45 +13221,6 @@
         }
       ]
     ],
-    "packet_graphics_parameter_override": [
-      "container",
-      [
-        {
-          "name": "values",
-          "type": [
-            "array",
-            {
-              "countType": "varint",
-              "type": [
-                "container",
-                [
-                  {
-                    "name": "key",
-                    "type": "lf32"
-                  },
-                  {
-                    "name": "value",
-                    "type": "vec3f"
-                  }
-                ]
-              ]
-            }
-          ]
-        },
-        {
-          "name": "biome_identifier",
-          "type": "string"
-        },
-        {
-          "name": "parameter_type",
-          "type": "GraphicsOverrideParameterType"
-        },
-        {
-          "name": "reset",
-          "type": "bool"
-        }
-      ]
-    ],
     "InputLockFlags": [
       "bitflags",
       {
@@ -13526,17 +13495,17 @@
           ]
         },
         {
-          "name": "spline_instruction",
+          "name": "spline",
           "type": [
             "option",
             "CameraSplineInstruction"
           ]
         },
         {
-          "name": "attach_instruction",
+          "name": "attach_to_entity",
           "type": [
             "option",
-            "CameraAttachToEntityInstruction"
+            "li64"
           ]
         },
         {
@@ -14568,6 +14537,33 @@
               }
             ]
           ]
+        }
+      ]
+    ],
+    "packet_graphics_override_parameter": [
+      "container",
+      [
+        {
+          "name": "values",
+          "type": [
+            "array",
+            {
+              "countType": "varint",
+              "type": "ParameterKeyframeValue"
+            }
+          ]
+        },
+        {
+          "name": "biome_identifier",
+          "type": "string"
+        },
+        {
+          "name": "parameter_type",
+          "type": "GraphicsOverrideParameterType"
+        },
+        {
+          "name": "reset",
+          "type": "bool"
         }
       ]
     ]
