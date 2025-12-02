@@ -28,9 +28,11 @@
   "scripts": {
     "build": "bun tsc || true && cp src/config/steve.json dist/config/ && cp src/Events.d.ts dist/",
     "bundle": "rollup -c rollup.config.mjs",
-    "release": "bun tsc || true && git commit -m \"Prepare Release\" || true && npm version patch && git push && git push --tags && npm publish"
+    "release": "bun tsc || true && git commit -m \"Prepare Release\" || true && npm version patch && git push && git push --tags && npm publish",
+    "release:full": "bun tsc || true && git commit -m \"Prepare Release\" || true && npm version minor && git push && git push --tags && npm publish"
   },
   "dependencies": {
+    "@roamhq/wrtc": "^0.9.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/uuid-1345": "^0.99.25",
     "chalk": "^5.6.2",
@@ -38,13 +40,16 @@
     "dgram": "^1.0.1",
     "gradient-string": "^3.0.0",
     "jsonwebtoken": "^9.0.2",
+    "node-nethernet": "github:LucienHH/node-nethernet#protocol",
     "prismarine-auth": "github:LucienHH/prismarine-auth#playfab",
     "prismarine-nbt": "^2.7.0",
     "protodef": "^1.18.0",
+    "raknet-native": "^1.2.3",
     "sdp-transform": "^2.15.0",
     "snappy": "^7.2.2",
     "uuid-1345": "^1.0.2",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "xbox-rta": "^2.1.0"
   },
   "devDependencies": {
     "@types/events": "^3.0.3",
@@ -52,7 +57,6 @@
     "@types/sdp-transform": "^2.15.0",
     "@types/ws": "^8.18.1",
     "prettier": "^3.6.2",
-    "raknet-native": "^1.2.3",
     "rollup": "^4.52.2",
     "rollup-plugin-dts": "^6.2.3",
     "typescript": "^5.4.5"

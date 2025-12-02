@@ -2,5 +2,11 @@ node_modules
 src
 bun.lock
 .gitignore
-rollup.config.,js
+rollup.config.mjs
 tsconfig.json
+.tmp
+auth
+test_write.txt
+start.bat
+docs
+*.tgz

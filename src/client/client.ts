@@ -5,16 +5,18 @@ import { Events } from '../Events';
 import { keyExchange } from "../handshake/keyExchange";
 import login from "../handshake/login";
 import loginVerify from "../handshake/loginVerify";
+import { NethernetClient } from "../nethernet";
+import { PacketViolationWarningPacket } from "../packets/packet_packet_violation_warning";
 import { RaknetClient } from "../rak";
 import { createDeserializer, createSerializer } from "../transforms/serializer";
 import { ClientOptions, clientStatus } from "../types";
+import { Errors } from "../utils/errors";
 import { Logger } from "../utils/logger";
 import { authenticate, AuthenticationType } from "./auth";
 import { Connection } from "./connection";
-import { Errors } from "../utils/errors";
 
 export class Client extends Connection {
-    connection!: RaknetClient;
+    connection!: RaknetClient | NethernetClient;
 
     public features: any;
     public options: ClientOptions;
@@ -29,6 +31,12 @@ export class Client extends Connection {
     public accessToken!: string;
     public clientIdentityChain!: string;
     public clientUserChain!: string;
+    public nethernet: any;
+    public networkSettingsRequested = false;
+
+    public start: number = Date.now();
+    public end: number = Date.now();
+    public difference: number = 0;
 
     override on<K extends keyof Events>(event: K, listener: Events[K]): this {
         return super.on(event, listener);
@@ -45,6 +53,10 @@ export class Client extends Connection {
         this.startGameData = {};
         this.clientRuntimeId = null;
         this.viewDistance = options.viewDistance ?? 10;
+
+        if (this.options.transport === "nethernet") {
+            this.nethernet = {};
+        }
 
         if (!options.delayedInit) {
             this.init();
@@ -84,10 +96,11 @@ export class Client extends Connection {
         this.connection?.close();
         //this.removeAllListeners();
         this.setStatus(clientStatus.Disconnected);
+        this.networkSettingsRequested = false;
     };
 
     public init() {
-        if (this.options.protocolVersion !== config.protocol) throw Errors.invalidProtocol(this.options.protocolVersion)
+        if (this.options.protocolVersion !== config.protocol) throw Errors.invalidProtocol(this.options.protocolVersion);
         this.serializer = createSerializer();
         this.deserializer = createDeserializer();
 
@@ -99,12 +112,16 @@ export class Client extends Connection {
         const port = this.options.port;
 
         const networkId = this.options.networkId;
-        if (networkId) throw Errors.unsupportedProtocol();
 
-        this.connection = new RaknetClient({ useWorkers: true, host, port });
-        this.batchHeader = 0xfe;
-        this.disableEncryption = false;
-
+        if (this.options.transport === 'nethernet') {
+            this.connection = new NethernetClient({ networkId });
+            this.batchHeader = null;
+            this.disableEncryption = true;
+        } else if (this.options.transport === 'raknet') {
+            this.connection = new RaknetClient({ useWorkers: true, host, port });
+            this.batchHeader = 0xfe;
+            this.disableEncryption = false;
+        }
 
         this.emit('connect_allowed');
     };
@@ -127,12 +144,17 @@ export class Client extends Connection {
             case 'server_to_client_handshake':
                 this.emit('client.server_handshake', des.data.params);
                 break;
-            case "network_settings":
-                this.compressionAlgorithm = packet.compression_algorithm || 'deflate';
-                this.compressionThreshold = packet.compression_threshold;
+            case "network_settings": {
+                this.start = Date.now();
+                Logger.debug(`Network settings ${JSON.stringify(pakData.params)}`, this.options.debug);
+                const compressionAlgorithm = pakData.params.compression_algorithm ?? 'deflate';
+                this.compressionAlgorithm = compressionAlgorithm;
+                this.compressionHeader = compressionAlgorithm === 'snappy' ? 1 : 0;
+                this.compressionThreshold = pakData.params.compression_threshold ?? this.compressionThreshold;
                 this.compressionReady = true;
                 if (this.status === clientStatus.Connecting) this.sendLogin();
                 break;
+            }
             case 'disconnect':
                 this.emit(des.data.name, des.data.params);
                 this.onDisconnectRequest(des.data.params);
@@ -150,11 +172,22 @@ export class Client extends Connection {
                 break;
             case 'play_status':
                 if (this.status === clientStatus.Authenticating) {
+                    this.end = Date.now();
+                    this.difference = this.end - this.start;
                     this.emit('join');
                     this.setStatus(clientStatus.Initializing);
                 }
                 this.onPlayStatus(pakData.params);
                 break;
+            case 'packet_violation_warning': {
+                const violation = pakData.params as PacketViolationWarningPacket;
+                Logger.debug(
+                    `Packet violation warning id=${violation.packet_id} severity=${violation.severity} type=${violation.violation_type} reason=${violation.reason}`,
+                    this.options.debug
+                );
+                this.emit('packet_violation_warning', violation);
+                break;
+            }
             default:
                 if (this.status !== clientStatus.Initializing && this.status !== clientStatus.Initialized) {
                     console.error(`Can't accept ${des.data.name}, client not authenticated yet : ${this.status}`);
@@ -180,10 +213,18 @@ export class Client extends Connection {
     _connect = async () => {
         this.connection.onConnected = () => {
             this.setStatus(clientStatus.Connecting);
-            this.queue('request_network_settings', { client_protocol: Number(config.protocol) });
+            if (!this.networkSettingsRequested) {
+                this.networkSettingsRequested = true;
+                this.queue('request_network_settings', { client_protocol: Number(config.protocol) });
+            }
         };
         this.connection.onCloseConnection = (reason: any) => {
             Logger.debug(`Server closed connection: ${reason}`, this.status === clientStatus.Disconnected && config.debug);
+            // if (!wasManual && this.autoReconnect) {
+            //     const delay = Math.min(30000, 2000 * Math.max(1, ++this.reconnectAttempts));
+            //     Logger.debug(`Scheduling Nethernet reconnect in ${delay}ms`);
+            //     this.scheduleReconnect(delay);
+            // }
         };
 
         this.connection.onEncapsulated = this.onEncapsulated;

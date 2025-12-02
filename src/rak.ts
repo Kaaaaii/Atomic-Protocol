@@ -26,6 +26,7 @@ export class RaknetClient extends EventEmitter {
         });
 
         this.raknet.on("connect", () => {
+            if (this.connected) return;
             this.connected = true;
             this.onConnected();
         });

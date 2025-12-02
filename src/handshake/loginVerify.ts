@@ -1,8 +1,8 @@
 import * as crypto from "crypto";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { config } from "../config/config";
-import { Logger } from "../utils/logger";
 import { PUBLIC_KEY } from "../types";
+import { Logger } from "../utils/logger";
 
 export = (client: any) => {
     const getDER = (b64: any) => crypto.createPublicKey({ key: Buffer.from(b64, 'base64'), format: 'der', type: 'spki' });
@@ -35,7 +35,7 @@ export = (client: any) => {
             const x5u = getX5U(token);
             if (x5u === PUBLIC_KEY && !data.extraData?.XUID) {
                 didVerify = true;
-    Logger.debug(`Verified Client With Mojang Key: ${x5u}`, config.debug);
+                Logger.debug(`Verified Client With Mojang Key: ${x5u}`, config.debug);
             }
 
             pubKey = decoded.identityPublicKey ? getDER(decoded.identityPublicKey) : x5u;

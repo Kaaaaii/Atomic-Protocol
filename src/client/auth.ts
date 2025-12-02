@@ -27,7 +27,7 @@ export const realmAuth = async (options: ClientOptions) => {
                     }
                 });
 
-                if (!fetchResponse.ok)  throw Errors.noRealm(fetchResponse.status, fetchResponse.statusText);
+                if (!fetchResponse.ok) throw Errors.noRealm(fetchResponse.status, fetchResponse.statusText);
 
                 const json = await fetchResponse.json();
 
