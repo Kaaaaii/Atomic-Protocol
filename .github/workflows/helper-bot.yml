@@ -1,0 +1,17 @@
+name: Bedrock Watcher
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"
+  workflow_dispatch:
+
+jobs:
+  watcher:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: oven-sh/setup-bun@v1
+    - run: bun .github/helper-bot/index.ts
+      env:
+        GITHUB_TOKEN: ${{ secrets.ATOMIC_SECRET }}
