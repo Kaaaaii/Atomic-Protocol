@@ -1,7 +1,20 @@
+/**
+ * TakeItemEntityPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Varint64 } from "./varint64";
 
 export interface TakeItemEntityPacket {
   runtime_entity_id: Varint64;
   target: number;
 }
+
+
+export type Varint64 = any;
+
+export const TakeItemEntityPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "take_item_entity",
+  description: undefined,
+};

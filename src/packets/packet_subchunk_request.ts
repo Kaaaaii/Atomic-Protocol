@@ -1,5 +1,9 @@
+/**
+ * SubchunkRequestPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Vec3i } from "./vec3i";
 
 export interface SubchunkRequestPacket {
   dimension: number;
@@ -8,3 +12,16 @@ export interface SubchunkRequestPacket {
   dy: number;
   dz: number;}[];
 }
+
+
+export interface Vec3i {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export const SubchunkRequestPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "subchunk_request",
+  description: undefined,
+};

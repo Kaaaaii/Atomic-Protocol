@@ -1,6 +1,9 @@
+/**
+ * EventPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Varint64 } from "./varint64";
-import type { RestBuffer } from "./restBuffer";
 
 export interface EventPacket {
   runtime_id: Varint64;
@@ -8,3 +11,15 @@ export interface EventPacket {
   use_player_id: number;
   event_data: RestBuffer;
 }
+
+
+export type Varint64 = any;
+
+
+export type RestBuffer = any;
+
+export const EventPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "event",
+  description: undefined,
+};

@@ -1,5 +1,9 @@
+/**
+ * AvailableCommandsPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { CommandFlags } from "./CommandFlags";
 
 export interface AvailableCommandsPacket {
   values_len: number;
@@ -8,7 +12,7 @@ export interface AvailableCommandsPacket {
   chained_subcommand_values: string[];
   suffixes: string[];
   enums: {  name: string;
-  values: number | number | number[];}[];
+  values: { ../_enum_type: "byte"; value: number } | { ../_enum_type: "short"; value: number } | { ../_enum_type: "int"; value: number }[];}[];
   chained_subcommands: {  name: string;
   values: {  index: number;
   value: number;}[];}[];
@@ -30,3 +34,12 @@ export interface AvailableCommandsPacket {
   enum_index: number;
   constraints: {  constraint: "cheats_enabled" | "operator_permissions" | "host_permissions";}[];}[];
 }
+
+
+export type CommandFlags = any;
+
+export const AvailableCommandsPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "available_commands",
+  description: undefined,
+};

@@ -1,5 +1,9 @@
+/**
+ * LevelSoundEventV2Packet
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Vec3f } from "./vec3f";
 
 export interface LevelSoundEventV2Packet {
   sound_id: number;
@@ -9,3 +13,16 @@ export interface LevelSoundEventV2Packet {
   is_baby_mob: boolean;
   is_global: boolean;
 }
+
+
+export interface Vec3f {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export const LevelSoundEventV2PacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "level_sound_event_v2",
+  description: undefined,
+};

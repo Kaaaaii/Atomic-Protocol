@@ -1,6 +1,9 @@
+/**
+ * MobArmorEquipmentPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Varint64 } from "./varint64";
-import type { Item } from "./Item";
 
 export interface MobArmorEquipmentPacket {
   runtime_entity_id: Varint64;
@@ -10,3 +13,18 @@ export interface MobArmorEquipmentPacket {
   boots: Item;
   body: Item;
 }
+
+
+export type Varint64 = any;
+
+
+export interface Item {
+  network_id: number;
+  undefined: { network_id: "0"; value: void };
+}
+
+export const MobArmorEquipmentPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "mob_armor_equipment",
+  description: undefined,
+};

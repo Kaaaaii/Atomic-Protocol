@@ -14,4 +14,4 @@ jobs:
     - uses: oven-sh/setup-bun@v1
     - run: bun .github/helper-bot/index.ts
       env:
-        GITHUB_TOKEN: ${{ secrets.ATOMIC_SECRET }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

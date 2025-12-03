@@ -1,8 +1,32 @@
+/**
+ * UpdateClientInputLocksPacket
+ * Packet ID: 196
+ * UpdateClientInputLocksPacket
+ */
 
-import type { InputLockFlags } from "./InputLockFlags";
-import type { Vec3f } from "./vec3f";
 
 export interface UpdateClientInputLocksPacket {
   locks: InputLockFlags;
   position: Vec3f;
 }
+
+
+export type InputLockFlags = {  move: boolean;
+  jump: boolean;
+  sneak: boolean;
+  mount: boolean;
+  dismount: boolean;
+  rotation: boolean;};
+
+
+export interface Vec3f {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export const UpdateClientInputLocksPacketInfo: import("./metadata").PacketMetadata = {
+  id: 196,
+  name: "update_client_input_locks",
+  description: "UpdateClientInputLocksPacket",
+};

@@ -1,5 +1,9 @@
+/**
+ * GameTestRequestPacket
+ * Packet ID: 194
+ * Internal Text Packet
+ */
 
-import type { BlockCoordinates } from "./BlockCoordinates";
 
 export interface GameTestRequestPacket {
   max_tests_per_batch: number;
@@ -10,3 +14,16 @@ export interface GameTestRequestPacket {
   tests_per_row: number;
   name: string;
 }
+
+
+export interface BlockCoordinates {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export const GameTestRequestPacketInfo: import("./metadata").PacketMetadata = {
+  id: 194,
+  name: "game_test_request",
+  description: "Internal Text Packet",
+};

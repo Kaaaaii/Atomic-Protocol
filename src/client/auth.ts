@@ -60,10 +60,12 @@ export const realmAuth = async (options: ClientOptions) => {
 
                 options.host = host;
                 options.port = Number(port);
+                options.transport = "raknet";
                 resolve(null);
             } else {
                 options.networkId = address;
                 options.useSignalling = true;
+                options.transport = "nethernet";
                 resolve(null);
             }
         } catch (e) {

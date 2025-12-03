@@ -1,9 +1,13 @@
+/**
+ * DebugRendererPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Vec3f } from "./vec3f";
 
 export interface DebugRendererPacket {
   type: "clear" | "add_cube";
-  undefined: void | {  text: string;
+  payload: { type: "clear"; value: void } | { type: "add_cube";   text: string;
   position: Vec3f;
   red: number;
   green: number;
@@ -11,3 +15,16 @@ export interface DebugRendererPacket {
   alpha: number;
   duration: number;};
 }
+
+
+export interface Vec3f {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export const DebugRendererPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "debug_renderer",
+  description: undefined,
+};

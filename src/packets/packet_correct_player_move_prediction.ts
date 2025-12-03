@@ -1,7 +1,9 @@
+/**
+ * CorrectPlayerMovePredictionPacket
+ * Packet ID: 161
+ * Sent to a player when their simulation of movement mismatches enough from the server that it wants to correct the client.
+ */
 
-import type { Vec3f } from "./vec3f";
-import type { Vec2f } from "./vec2f";
-import type { Varint64 } from "./varint64";
 
 export interface CorrectPlayerMovePredictionPacket {
   prediction_type: "player" | "vehicle";
@@ -12,3 +14,25 @@ export interface CorrectPlayerMovePredictionPacket {
   on_ground: boolean;
   tick: Varint64;
 }
+
+
+export interface Vec3f {
+  x: number;
+  y: number;
+  z: number;
+}
+
+
+export interface Vec2f {
+  x: number;
+  z: number;
+}
+
+
+export type Varint64 = any;
+
+export const CorrectPlayerMovePredictionPacketInfo: import("./metadata").PacketMetadata = {
+  id: 161,
+  name: "correct_player_move_prediction",
+  description: "Sent to a player when their simulation of movement mismatches enough from the server that it wants to correct the client.",
+};

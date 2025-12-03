@@ -1,2 +1,0 @@
-
-export type Lnbt = any;

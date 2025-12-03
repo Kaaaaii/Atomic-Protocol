@@ -1,3 +1,9 @@
+/**
+ * CameraAimAssistPresetsPacket
+ * Packet ID: 320
+ * Camera aim-assist registry presets/categories data sent from the server to clients.
+ */
+
 
 export interface CameraAimAssistPresetsPacket {
   categories: {  name: string;
@@ -16,3 +22,10 @@ export interface CameraAimAssistPresetsPacket {
   hand_settings: string | null;}[];
   operation: "set" | "add_to_existing";
 }
+
+
+export const CameraAimAssistPresetsPacketInfo: import("./metadata").PacketMetadata = {
+  id: 320,
+  name: "camera_aim_assist_presets",
+  description: "Camera aim-assist registry presets/categories data sent from the server to clients.",
+};

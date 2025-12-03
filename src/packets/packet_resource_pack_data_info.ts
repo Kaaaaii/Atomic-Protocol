@@ -1,5 +1,9 @@
+/**
+ * ResourcePackDataInfoPacket
+ * Packet ID: 82
+ * Resource Pack Data Info
+ */
 
-import type { ByteArray } from "./ByteArray";
 
 export interface ResourcePackDataInfoPacket {
   pack_id: string;
@@ -10,3 +14,12 @@ export interface ResourcePackDataInfoPacket {
   is_premium: boolean;
   pack_type: "addon" | "cached" | "copy_protected" | "behavior" | "persona_piece" | "resources" | "skins" | "world_template";
 }
+
+
+export type ByteArray = any;
+
+export const ResourcePackDataInfoPacketInfo: import("./metadata").PacketMetadata = {
+  id: 82,
+  name: "resource_pack_data_info",
+  description: "Resource Pack Data Info",
+};

@@ -1,6 +1,9 @@
+/**
+ * ClientMovementPredictionSyncPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Varint128 } from "./varint128";
-import type { Varint64 } from "./varint64";
 
 export interface ClientMovementPredictionSyncPacket {
   data_flags: Varint128;
@@ -16,3 +19,12 @@ export interface ClientMovementPredictionSyncPacket {
   entity_runtime_id: Varint64;
   is_flying: boolean;
 }
+
+
+export type Varint64 = any;
+
+export const ClientMovementPredictionSyncPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "client_movement_prediction_sync",
+  description: undefined,
+};

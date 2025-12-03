@@ -1,9 +1,9 @@
+/**
+ * CameraInstructionPacket
+ * Packet ID: 300
+ * Used to send a CameraInstruction from the server to the specified clients.
+ */
 
-import type { EaseType } from "./EaseType";
-import type { Vec3f } from "./vec3f";
-import type { Vec2f } from "./vec2f";
-import type { CameraSplineInstruction } from "./CameraSplineInstruction";
-import type { CameraAttachToEntityInstruction } from "./CameraAttachToEntityInstruction";
 
 export interface CameraInstructionPacket {
   instruction_set: {  runtime_id: number;
@@ -28,7 +28,47 @@ export interface CameraInstructionPacket {
   ease_time: number;
   ease_type: EaseType;
   clear: boolean;} | null;
-  spline_instruction: CameraSplineInstruction | null;
-  attach_instruction: CameraAttachToEntityInstruction | null;
+  spline: CameraSplineInstruction | null;
+  attach_to_entity: number | null;
   detach_from_entity: boolean | null;
 }
+
+
+export type EaseType = "Linear" | "Spring" | "InQuad" | "OutQuad" | "InOutQuad" | "InCubic" | "OutCubic" | "InOutCubic" | "InQuart" | "OutQuart" | "InOutQuart" | "InQuint" | "OutQuint" | "InOutQuint" | "InSine" | "OutSine" | "InOutSine" | "InExpo" | "OutExpo" | "InOutExpo" | "InCirc" | "OutCirc" | "InOutCirc" | "InBounce" | "OutBounce" | "InOutBounce" | "InBack" | "OutBack" | "InOutBack" | "InElastic" | "OutElastic" | "InOutElastic";
+
+
+export interface Vec3f {
+  x: number;
+  y: number;
+  z: number;
+}
+
+
+export interface Vec2f {
+  x: number;
+  z: number;
+}
+
+
+export interface CameraSplineInstruction {
+  total_time: number;
+  ease_type: CameraSplineEaseType;
+  curve: Vec3f[];
+  progress_key_frames: Vec2f[];
+  rotation_options: CameraRotationOption[];
+}
+
+
+export type CameraSplineEaseType = "catmull_rom" | "linear";
+
+
+export interface CameraRotationOption {
+  value: Vec3f;
+  time: number;
+}
+
+export const CameraInstructionPacketInfo: import("./metadata").PacketMetadata = {
+  id: 300,
+  name: "camera_instruction",
+  description: "Used to send a CameraInstruction from the server to the specified clients.",
+};

@@ -1,5 +1,9 @@
+/**
+ * CameraAimAssistPacket
+ * Packet ID: 316
+ * CameraAimAssist
+ */
 
-import type { Vec2f } from "./vec2f";
 
 export interface CameraAimAssistPacket {
   preset_id: string;
@@ -9,3 +13,15 @@ export interface CameraAimAssistPacket {
   action: "set" | "clear";
   show_debug_render: boolean;
 }
+
+
+export interface Vec2f {
+  x: number;
+  z: number;
+}
+
+export const CameraAimAssistPacketInfo: import("./metadata").PacketMetadata = {
+  id: 316,
+  name: "camera_aim_assist",
+  description: "CameraAimAssist",
+};

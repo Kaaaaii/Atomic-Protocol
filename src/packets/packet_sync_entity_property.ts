@@ -1,6 +1,19 @@
+/**
+ * SyncEntityPropertyPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Nbt } from "./nbt";
 
 export interface SyncEntityPropertyPacket {
   nbt: Nbt;
 }
+
+
+export type Nbt = any;
+
+export const SyncEntityPropertyPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "sync_entity_property",
+  description: undefined,
+};

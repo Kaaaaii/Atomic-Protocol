@@ -1,15 +1,9 @@
+/**
+ * StartGamePacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Varint64 } from "./varint64";
-import type { GameMode } from "./GameMode";
-import type { Vec3f } from "./vec3f";
-import type { Vec2f } from "./vec2f";
-import type { BlockCoordinates } from "./BlockCoordinates";
-import type { GameRules } from "./GameRules";
-import type { Experiments } from "./Experiments";
-import type { PermissionLevel } from "./PermissionLevel";
-import type { EducationSharedResourceURI } from "./EducationSharedResourceURI";
-import type { BlockProperties } from "./BlockProperties";
-import type { Nbt } from "./nbt";
 
 export interface StartGamePacket {
   entity_id: number;
@@ -43,7 +37,7 @@ export interface StartGamePacket {
   platform_broadcast_mode: number;
   enable_commands: boolean;
   is_texturepacks_required: boolean;
-  gamerules: GameRules;
+  gamerules: GameRuleVarint[];
   experiments: Experiments;
   experiments_previously_used: boolean;
   bonus_chest: boolean;
@@ -92,3 +86,68 @@ export interface StartGamePacket {
   tick_death_systems: boolean;
   server_controlled_sound: boolean;
 }
+
+
+export type Varint64 = any;
+
+
+export type GameMode = "survival" | "creative" | "adventure" | "survival_spectator" | "creative_spectator" | "fallback" | "spectator";
+
+
+export interface Vec3f {
+  x: number;
+  y: number;
+  z: number;
+}
+
+
+export interface Vec2f {
+  x: number;
+  z: number;
+}
+
+
+export interface BlockCoordinates {
+  x: number;
+  y: number;
+  z: number;
+}
+
+
+export interface GameRuleVarint {
+  name: string;
+  editable: boolean;
+  type: "bool" | "int" | "float";
+  value: { type: "bool"; value: boolean } | { type: "int"; value: number } | { type: "float"; value: number };
+}
+
+
+export type Experiments = Experiment[];
+
+
+export type PermissionLevel = "visitor" | "member" | "operator" | "custom";
+
+
+export interface EducationSharedResourceURI {
+  button_name: string;
+  link_uri: string;
+}
+
+
+export type BlockProperties = {  name: string;
+  state: Nbt;}[];
+
+
+export type Nbt = any;
+
+
+export interface Experiment {
+  name: string;
+  enabled: boolean;
+}
+
+export const StartGamePacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "start_game",
+  description: undefined,
+};

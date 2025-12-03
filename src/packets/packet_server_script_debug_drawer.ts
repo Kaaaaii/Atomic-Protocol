@@ -1,6 +1,9 @@
+/**
+ * ServerScriptDebugDrawerPacket
+ * Unknown packet ID
+ * No description
+ */
 
-import type { Varint64 } from "./varint64";
-import type { Vec3f } from "./vec3f";
 
 export interface ServerScriptDebugDrawerPacket {
   shapes: {  network_id: Varint64;
@@ -17,3 +20,19 @@ export interface ServerScriptDebugDrawerPacket {
   arrow_head_radius: number | null;
   segment_count: number | null;}[];
 }
+
+
+export type Varint64 = any;
+
+
+export interface Vec3f {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export const ServerScriptDebugDrawerPacketInfo: import("./metadata").PacketMetadata = {
+  id: undefined,
+  name: "server_script_debug_drawer",
+  description: undefined,
+};
