@@ -38,7 +38,7 @@
     "chalk": "^5.6.2",
     "gradient-string": "^3.0.0",
     "jsonwebtoken": "^9.0.2",
-    "node-nethernet": "github:LucienHH/node-nethernet#protocol",
+    "atomic-nethernet": "github:Serial-V/Atomic-Nethernet",
     "prismarine-auth": "github:LucienHH/prismarine-auth#playfab",
     "prismarine-nbt": "^2.7.0",
     "protodef": "^1.18.0",

@@ -1,5 +1,5 @@
-import type { IceServer } from "node-nethernet";
-import { SignalStructure } from "node-nethernet";
+import type { IceServer } from "atomic-nethernet";
+import { SignalStructure } from "atomic-nethernet";
 import { EventEmitter, once } from "node:events";
 import { RawData, WebSocket } from "ws";
 import { config } from "../config/config";
