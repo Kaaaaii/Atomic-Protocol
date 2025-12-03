@@ -50,15 +50,25 @@ async function getLatestVersion() {
 }
 
 async function getProtocolVersion(): Promise<string> {
-    const url = "https://raw.githubusercontent.com/pmmp/PocketMine-MP/stable/src/pocketmine/network/mcpe/protocol/ProtocolInfo.php";
+    const sources = [
+        "https://raw.githubusercontent.com/pmmp/BedrockProtocol/master/src/ProtocolInfo.php",
+        "https://raw.githubusercontent.com/pmmp/PocketMine-MP/stable/src/pocketmine/network/mcpe/protocol/ProtocolInfo.php"
+    ];
 
-    const res = await fetch(url);
-    const text = await res.text();
+    for (const url of sources) {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) continue;
 
-    const match = text.match(/public const CURRENT_PROTOCOL = (\d+);/);
-    if (!match) throw new Error("Failed to determine protocol ID from PocketMine");
+            const text = await res.text();
+            const match = text.match(/public const CURRENT_PROTOCOL = (\d+);/);
+            if (match) return match[1];
+        } catch {
 
-    return match[1];
+        }
+    }
+
+    throw new Error("Failed to determine protocol ID from BedrockProtocol or PocketMine");
 }
 
 async function getCommits(repo: string, containing: string, since?: string) {

@@ -7,13 +7,35 @@ import { NethernetClient } from "./nethernet";
 import { RaknetClient } from "./rak";
 import { ClientOptions } from "./types";
 import { convert } from "./utils/convert";
+import { AtomicError } from "./utils/errors.js";
 import { Logger } from "./utils/logger";
 import { sleep } from "./utils/utilities";
 import { NethernetSignal } from "./websocket/signal";
 
 export const createClient = (options: ClientOptions) => {
     assert(options);
-    const client = new Client({ port: 19132, delayedInit: true, followPort: !options.realmId, protocolVersion: config.protocol, version: config.minecraftVersion, ...options });
+
+    const transport = options.networkId !== undefined ? "nethernet" : (options.host || options.port) ? "raknet" : options.transport ?? "raknet";
+
+    if (!options.realmId) {
+        if (transport === "raknet" && !options.host) {
+            throw new AtomicError("CREATION_FAILED", "'host' is required when connecting over RakNet without a realmId");
+        }
+
+        if (transport === "nethernet" && options.networkId === undefined) {
+            throw new AtomicError("CREATION_FAILED", "'networkId' is required when connecting over Nethernet without a realmId");
+        }
+    }
+
+    const client = new Client({
+        port: 19132,
+        delayedInit: true,
+        followPort: !options.realmId,
+        protocolVersion: config.protocol,
+        version: config.minecraftVersion,
+        transport,
+        ...options
+    });
 
     config.debug = options.debug ?? false;
 
