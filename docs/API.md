@@ -9,11 +9,18 @@ import { Authflow } from "prismarine-auth";
 import { createClient } from "atomic-protocol";
 
 const authflow = new Authflow("atomic-profile", "./.minecraft"); // caches tokens locally
+// Or
+const token = {
+  XSTSToken: "ms_token_here",
+  userHash: "ms_hash_here",
+  userXUID: "ms_xuid_here" | null
+  expiresOn: "ms_expires_here"
+}
 
 const client = createClient({
-  host: "play.example.com",
+  host: "play.atomicts.net",
   port: 19132,
-  authflow,
+  authflow: authflow | token,
   debug: true,
 });
 
