@@ -17,9 +17,6 @@ export interface AnimatePacket {
   runtime_entity_id: Varint64;
   data: number;
   swing_source: number;
-  payload:
-    | { action_id: "row_right"; rowing_time: number }
-    | { action_id: "row_left"; rowing_time: number };
 }
 
 export type Varint64 = any;

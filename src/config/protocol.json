@@ -6389,173 +6389,172 @@
       "container",
       [
         {
-          "name": "type",
+          "name": "needs_translation",
+          "type": "bool"
+        },
+        {
+          "name": "category",
           "type": [
             "mapper",
             {
               "type": "u8",
               "mappings": {
-                "0": "raw",
-                "1": "chat",
-                "2": "translation",
-                "3": "popup",
-                "4": "jukebox_popup",
-                "5": "tip",
-                "6": "system",
-                "7": "whisper",
-                "8": "announcement",
-                "9": "json_whisper",
-                "10": "json",
-                "11": "json_announcement"
+                "0": "message_only",
+                "1": "author_and_message",
+                "2": "message_and_params"
               }
             }
           ]
-        },
-        {
-          "name": "needs_translation",
-          "type": "bool"
         },
         {
           "anon": true,
           "type": [
             "switch",
             {
-              "compareTo": "type",
+              "compareTo": "category",
               "fields": {
-                "chat": [
+                "message_only": [
                   "container",
                   [
                     {
-                      "name": "source_name",
+                      "name": "name_raw",
                       "type": "string"
                     },
                     {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "whisper": [
-                  "container",
-                  [
-                    {
-                      "name": "source_name",
+                      "name": "name_tip",
                       "type": "string"
                     },
                     {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "announcement": [
-                  "container",
-                  [
-                    {
-                      "name": "source_name",
+                      "name": "name_system",
                       "type": "string"
                     },
                     {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "raw": [
-                  "container",
-                  [
-                    {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "tip": [
-                  "container",
-                  [
-                    {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "system": [
-                  "container",
-                  [
-                    {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "json_whisper": [
-                  "container",
-                  [
-                    {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "json": [
-                  "container",
-                  [
-                    {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "json_announcement": [
-                  "container",
-                  [
-                    {
-                      "name": "message",
-                      "type": "string"
-                    }
-                  ]
-                ],
-                "translation": [
-                  "container",
-                  [
-                    {
-                      "name": "message",
+                      "name": "name_object_whisper",
                       "type": "string"
                     },
                     {
-                      "name": "parameters",
+                      "name": "name_object_announcement",
+                      "type": "string"
+                    },
+                    {
+                      "name": "name_object",
+                      "type": "string"
+                    },
+                    {
+                      "name": "type",
                       "type": [
-                        "array",
+                        "mapper",
                         {
-                          "countType": "varint",
-                          "type": "string"
+                          "type": "u8",
+                          "mappings": {
+                            "0": "raw",
+                            "1": "chat",
+                            "2": "translation",
+                            "3": "popup",
+                            "4": "jukebox_popup",
+                            "5": "tip",
+                            "6": "system",
+                            "7": "whisper",
+                            "8": "announcement",
+                            "9": "json_whisper",
+                            "10": "json",
+                            "11": "json_announcement"
+                          }
                         }
                       ]
-                    }
-                  ]
-                ],
-                "popup": [
-                  "container",
-                  [
+                    },
                     {
                       "name": "message",
                       "type": "string"
-                    },
-                    {
-                      "name": "parameters",
-                      "type": [
-                        "array",
-                        {
-                          "countType": "varint",
-                          "type": "string"
-                        }
-                      ]
                     }
                   ]
                 ],
-                "jukebox_popup": [
+                "author_and_message": [
                   "container",
                   [
+                    {
+                      "name": "name_chat",
+                      "type": "string"
+                    },
+                    {
+                      "name": "name_whisper",
+                      "type": "string"
+                    },
+                    {
+                      "name": "name_announcement",
+                      "type": "string"
+                    },
+                    {
+                      "name": "type",
+                      "type": [
+                        "mapper",
+                        {
+                          "type": "u8",
+                          "mappings": {
+                            "0": "raw",
+                            "1": "chat",
+                            "2": "translation",
+                            "3": "popup",
+                            "4": "jukebox_popup",
+                            "5": "tip",
+                            "6": "system",
+                            "7": "whisper",
+                            "8": "announcement",
+                            "9": "json_whisper",
+                            "10": "json",
+                            "11": "json_announcement"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "source_name",
+                      "type": "string"
+                    },
+                    {
+                      "name": "message",
+                      "type": "string"
+                    }
+                  ]
+                ],
+                "message_and_params": [
+                  "container",
+                  [
+                    {
+                      "name": "name_translate",
+                      "type": "string"
+                    },
+                    {
+                      "name": "name_popup",
+                      "type": "string"
+                    },
+                    {
+                      "name": "name_jukebox_popup",
+                      "type": "string"
+                    },
+                    {
+                      "name": "type",
+                      "type": [
+                        "mapper",
+                        {
+                          "type": "u8",
+                          "mappings": {
+                            "0": "raw",
+                            "1": "chat",
+                            "2": "translation",
+                            "3": "popup",
+                            "4": "jukebox_popup",
+                            "5": "tip",
+                            "6": "system",
+                            "7": "whisper",
+                            "8": "announcement",
+                            "9": "json_whisper",
+                            "10": "json",
+                            "11": "json_announcement"
+                          }
+                        }
+                      ]
+                    },
                     {
                       "name": "message",
                       "type": "string"
@@ -6586,7 +6585,10 @@
         },
         {
           "name": "filtered_message",
-          "type": "string"
+          "type": [
+            "option",
+            "string"
+          ]
         }
       ]
     ],
