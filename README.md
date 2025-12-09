@@ -7,7 +7,7 @@ Atomic Protocol is a modern, efficient, and fully TypeScript-rewritten version o
 [PrismarineJS/bedrock-protocol](https://github.com/PrismarineJS/bedrock-protocol).  
 It’s built with performance and maintainability in mind.
 
-- ✅ Minecraft Version: `1.21.124`
+- ✅ Minecraft Version: `1.21.130`
 - ✅ Written in TypeScript  
 - ✅ Strongly-typed packet definitions
 - ✅ Clean API for client creation  
