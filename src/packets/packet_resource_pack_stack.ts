@@ -6,7 +6,6 @@
 
 export interface ResourcePackStackPacket {
   must_accept: boolean;
-  behavior_packs: ResourcePackIdVersions;
   resource_packs: ResourcePackIdVersions;
   game_version: string;
   experiments: Experiments;

@@ -1200,4 +1200,9 @@ export const PACKET_METADATA: Record<string, PacketMetadata> = {
     description:
       "Sent from the server to the client when a server script changes the rendering settings",
   },
+  serverbound_data_store: {
+    id: undefined,
+    name: "serverbound_data_store",
+    description: undefined,
+  },
 };

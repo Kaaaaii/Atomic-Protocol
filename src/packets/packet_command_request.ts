@@ -8,7 +8,7 @@ export interface CommandRequestPacket {
   command: string;
   origin: CommandOrigin;
   internal: boolean;
-  version: number;
+  version: string;
 }
 
 export interface CommandOrigin {

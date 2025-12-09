@@ -39,7 +39,7 @@ export interface EventPacket {
     | "sneak_close_to_sculk_sensor"
     | "careful_restoration"
     | "item_used";
-  use_player_id: number;
+  use_player_id: boolean;
   event_data: RestBuffer;
 }
 

@@ -222,6 +222,7 @@ import type { ClientboundControlsSchemePacket } from "./packets/packet_clientbou
 import type { ServerScriptDebugDrawerPacket } from "./packets/packet_server_script_debug_drawer";
 import type { ServerboundPackSettingChangePacket } from "./packets/packet_serverbound_pack_setting_change";
 import type { GraphicsOverrideParameterPacket } from "./packets/packet_graphics_override_parameter";
+import type { ServerboundDataStorePacket } from "./packets/packet_serverbound_data_store";
 
 export interface Events {
   /**
@@ -1638,6 +1639,11 @@ export interface Events {
   graphics_override_parameter: (
     packet: GraphicsOverrideParameterPacket,
   ) => void;
+
+  /**
+   * Event for ServerboundDataStorePacket.
+   */
+  serverbound_data_store: (packet: ServerboundDataStorePacket) => void;
   session: () => void;
   close: () => void;
   error: () => void;

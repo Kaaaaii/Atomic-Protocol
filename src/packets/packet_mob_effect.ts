@@ -12,6 +12,7 @@ export interface MobEffectPacket {
   particles: boolean;
   duration: number;
   tick: Varint64;
+  ambient: boolean;
 }
 
 export type Varint64 = any;
