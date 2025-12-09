@@ -8078,35 +8078,6 @@
         {
           "name": "swing_source",
           "type": "i32"
-        },
-        {
-          "anon": true,
-          "type": [
-            "switch",
-            {
-              "compareTo": "action_id",
-              "fields": {
-                "row_right": [
-                  "container",
-                  [
-                    {
-                      "name": "rowing_time",
-                      "type": "lf32"
-                    }
-                  ]
-                ],
-                "row_left": [
-                  "container",
-                  [
-                    {
-                      "name": "rowing_time",
-                      "type": "lf32"
-                    }
-                  ]
-                ]
-              }
-            }
-          ]
         }
       ]
     ],
