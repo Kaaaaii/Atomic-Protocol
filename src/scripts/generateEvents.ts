@@ -72,6 +72,7 @@ const PRIMITIVES = new Set([
     "varint", "zigzag32", "zigzag64",
     "varint128",
     "li8", "li16", "li32", "li64", "lu8", "lu16", "lu32", "lu64",
+    "i32le",
     "f32", "f64", "lf32", "lf64",
     "bool", "string", "uuid", "buffer", "void", "native"
 ]);

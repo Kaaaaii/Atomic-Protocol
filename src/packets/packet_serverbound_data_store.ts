@@ -10,15 +10,17 @@ export interface ServerboundDataStorePacket {
   path: string;
   data_type: number;
   data:
-    | { data_type: "0"; value: number }
-    | { data_type: "1"; value: boolean }
-    | { data_type: "2"; value: string };
+  | { data_type: "0"; value: number; }
+  | { data_type: "1"; value: boolean; }
+  | { data_type: "2"; value: string; };
   update_count: I32le;
 }
 
+export type I32le = number;
+
 export const ServerboundDataStorePacketInfo: import("./metadata").PacketMetadata =
-  {
-    id: undefined,
-    name: "serverbound_data_store",
-    description: undefined,
-  };
+{
+  id: undefined,
+  name: "serverbound_data_store",
+  description: undefined,
+};

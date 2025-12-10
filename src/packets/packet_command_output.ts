@@ -12,6 +12,8 @@ export interface CommandOutputPacket {
   data: string | null;
 }
 
+export type I32le = number;
+
 export interface CommandOrigin {
   type:
     | "player"
