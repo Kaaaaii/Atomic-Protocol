@@ -1,3 +1,4 @@
+import { Events } from 'atomic-codec';
 import { EventEmitter } from 'events';
 import { config } from '../config/config';
 import { NethernetClient } from '../nethernet';
@@ -5,7 +6,7 @@ import { RaknetClient } from '../rak';
 import { createDecryptor, createEncryptor } from '../transforms/encryption';
 import Framer from '../transforms/framer';
 import { Codec, createDeserializer, createSerializer } from "../transforms/serializer";
-import { clientStatus, CompressionAlgorithm, Events } from '../types';
+import { clientStatus, CompressionAlgorithm } from '../types';
 import { Logger } from "../utils/logger";
 
 export class Connection extends EventEmitter {
