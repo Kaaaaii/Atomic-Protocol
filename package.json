@@ -26,16 +26,18 @@
     "doc": "docs"
   },
   "scripts": {
-    "build": "bun tsc && cp src/config/steve.json dist/config/",
-    "bundle": "rollup -c rollup.config.mjs",
-    "release": "bun tsc || true && git commit -m \"Prepare Release\" || true && npm version patch && git push && git push --tags && npm publish",
-    "release:full": "bun tsc || true && git commit -m \"Prepare Release\" || true && npm version minor && git push && git push --tags && npm publish"
+    "build": "tsc --project tsconfig.json && shx mkdir -p dist/config && shx cp src/config/steve.json dist/config/",
+    "lint": "tsc --noEmit",
+    "check": "turbo run lint --filter=.",
+    "dev": "turbo run build --filter=.",
+    "release": "turbo run bundle --filter=. && yarn version --patch && git push && git push --tags && yarn publish --non-interactive",
+    "release:minor": "turbo run bundle --filter=. && yarn version --minor && git push && git push --tags && yarn publish --non-interactive"
   },
   "dependencies": {
     "@roamhq/wrtc": "^0.9.1",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/uuid-1345": "^0.99.25",
-    "atomic-codec": "^1.0.9",
+    "atomic-codec": "^1.0.10",
     "atomic-net": "^1.0.1",
     "chalk": "^5.6.2",
     "gradient-string": "^3.0.0",
@@ -55,15 +57,8 @@
     "rollup": "^4.53.3",
     "rollup-plugin-dts": "^6.3.0",
     "shx": "^0.4.0",
+    "turbo": "^2.4.4",
     "typescript": "^5.9.3"
   },
-  "turbo": {
-    "pipeline": {
-      "build": {
-        "outputs": [
-          "dist/**"
-        ]
-      }
-    }
-  }
+  "packageManager": "yarn@1.22.22"
 }

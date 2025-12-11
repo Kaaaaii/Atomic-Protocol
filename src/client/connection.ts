@@ -137,7 +137,7 @@ export class Connection extends EventEmitter {
         this.sendPackets(batch.encode(), true);
     };
 
-    sendPackets(buffer: Buffer, immediate: boolean) { // Added "?" v3.6.1 due to TypeError: Cannot read properties of undefined (reading 'connected') ~ NoVa
+    sendPackets(buffer: Buffer, immediate: boolean) {
         if (this?.connection?.connected === false || this.status === clientStatus.Disconnected) return;
         try {
             this.connection.sendReliable(buffer, immediate);
@@ -152,21 +152,31 @@ export class Connection extends EventEmitter {
     };
 
     onDecryptedPacket = (buf: Buffer) => {
-        const packets = Framer.getPackets(buf);
-        packets.forEach((packet) => {
-            //@ts-ignore
-            this.readPacket(packet);
-        });
+        try {
+            const packets = Framer.getPackets(buf, { label: "onDecryptedPacket" });
+            packets.forEach((packet) => {
+                //@ts-ignore
+                this.readPacket(packet);
+            });
+        } catch (err) {
+            Logger.debug(`[Framer] failed to decode decrypted batch length=${buf.byteLength}`, config.debug);
+            this.emit("error", err as Error);
+        }
     };
 
     handle(buffer: Buffer) {
         if (!this.batchHeader || buffer[0] === this.batchHeader) {
             if (this.encryptionEnabled) this.decrypt(buffer.slice(1));
             else {
-                const packets = Framer.decode(this, buffer);
-                for (let packet of packets) {
-                    //@ts-ignore
-                    this.readPacket(packet);
+                try {
+                    const packets = Framer.decode(this, buffer);
+                    for (let packet of packets) {
+                        //@ts-ignore
+                        this.readPacket(packet);
+                    }
+                } catch (err) {
+                    Logger.debug(`[Framer] decode error batchLength=${buffer.byteLength} compression=${this.compressionAlgorithm} ready=${this.compressionReady}`, config.debug);
+                    this.emit("error", err as Error);
                 }
             };
         } else {

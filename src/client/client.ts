@@ -126,6 +126,8 @@ export class Client extends Connection {
 
     public readPacket(packet: any) {
         // if (config.ignoredPackets.includes(packet[0])) return;
+
+        Logger.debug(`Received Packet: ${packet[0]}`, config.debug);
         const des = this.deserializer.parsePacketBuffer(packet) as unknown as { data: { name: string, params: any; }; };
         const pakData = { name: des.data.name, params: des.data.params };
 

@@ -8,3 +8,5 @@ start.sh
 src/tests
 auth
 .vscode
+.turbo
+yarn-error.log
