@@ -9,9 +9,9 @@ export const config = {
 
     //Packets need fixing
     ignoredPackets: [
-        0x91, //145
-        0xC0, //192
-        0x4C //76
+        // 0x91, //145
+        // 0xC0, //192
+        // 0x4c, //76
     ],
 
     parties: {

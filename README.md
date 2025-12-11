@@ -69,6 +69,8 @@ client.on("text", (packet) => {
   - Fully Supported
 - [x] API Documentation
   - FAQ Soon
+- [x] Move the entire Codec in it's own REPO
+  - https://github.com/AtomicTS/Atomic-Codec
 - [ ] Atomic-Auth & Atomic-Realms
 - [ ] **Future Enhancements**
   - Consider adding proxy support (client ↔ server pass-through).

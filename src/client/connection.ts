@@ -1,14 +1,34 @@
+import { Events } from 'atomic-codec';
 import { EventEmitter } from 'events';
 import { config } from '../config/config';
 import { NethernetClient } from '../nethernet';
 import { RaknetClient } from '../rak';
 import { createDecryptor, createEncryptor } from '../transforms/encryption';
 import Framer from '../transforms/framer';
-import { createDeserializer, createSerializer } from "../transforms/serializer";
+import { Codec, createDeserializer, createSerializer } from "../transforms/serializer";
 import { clientStatus, CompressionAlgorithm } from '../types';
 import { Logger } from "../utils/logger";
 
 export class Connection extends EventEmitter {
+    // Typed event helpers for packet/connection events.
+    on<K extends keyof Events & (string | symbol)>(event: K, listener: Events[K]): this;
+    on(event: string | symbol, listener: (...args: any[]) => void): this;
+    on(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
+
+    once<K extends keyof Events & (string | symbol)>(event: K, listener: Events[K]): this;
+    once(event: string | symbol, listener: (...args: any[]) => void): this;
+    once(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.once(event, listener);
+    }
+
+    emit<K extends keyof Events & (string | symbol)>(event: K, ...args: Parameters<Events[K]>): boolean;
+    emit(event: string | symbol, ...args: any[]): boolean;
+    emit(event: string | symbol, ...args: any[]): boolean {
+        return super.emit(event, ...args);
+    }
+
     public connection!: RaknetClient | NethernetClient;
 
     public encryptionEnabled = false;
@@ -29,8 +49,8 @@ export class Connection extends EventEmitter {
     #status = clientStatus.Disconnected;
     sendQ: Buffer[] = [];
     loop!: NodeJS.Timeout;
-    serializer: any;
-    deserializer: any;
+    serializer: Codec;
+    deserializer: Codec;
 
     constructor() {
         super();
@@ -58,6 +78,21 @@ export class Connection extends EventEmitter {
     };
 
     write(name: any, params: any) {
+        if (name === "command_request") {
+            params ??= {};
+
+            params.command ??= "";
+            params.origin ??= {};
+
+            params.origin.origin ??= "player";
+            params.origin.uuid ??= "00000000-0000-0000-0000-000000000000";
+            params.origin.request_id ??= "req";
+            params.origin.player_entity_id ??= 1n;
+
+            params.internal ??= false;
+            params.version ??= "latest";
+        }
+
         this.framer.reset(this);
         const packet = this.serializer.createPacketBuffer({ name, params });
         this.framer.addEncodedPacket(packet);

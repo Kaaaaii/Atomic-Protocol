@@ -34,6 +34,7 @@ export class NethernetSignal extends EventEmitter {
     public credentials: IceServer[] = [];
 
     private destroyed = false;
+    private heartbeat: NodeJS.Timeout | null = null;
 
     constructor(networkId: string, authflow: Authflow | Tokens, version: string) {
         super();
@@ -53,6 +54,11 @@ export class NethernetSignal extends EventEmitter {
                 setTimeout(() => reject(new Error("Timed out waiting for credentials")), 15000)
             )
         ]);
+
+        //Added Heartbeat to keep the client connected
+        this.heartbeat = setInterval(() => {
+            this.ws?.send(JSON.stringify({ Type: MessageType.RequestPing }));
+        }, 40000);
     }
 
     async destroy() {
@@ -83,12 +89,19 @@ export class NethernetSignal extends EventEmitter {
             }
         }
 
+        //Stop Heartbeat on destroy
+        if (this.heartbeat) {
+            clearInterval(this.heartbeat);
+            this.heartbeat = null;
+        }
     }
 
     async init() {
-        const mcToken = this.auth instanceof Authflow
-            ? (await this.auth.getMinecraftBedrockServicesToken({ version: this.version })).mcToken
-            : this.auth.mcToken.token;
+        const flow: any = this.auth as any;
+        const usesAuthflow = typeof flow?.getMinecraftBedrockServicesToken === "function";
+        const mcToken = usesAuthflow
+            ? (await flow.getMinecraftBedrockServicesToken({ version: this.version })).mcToken
+            : flow.mcToken?.token ?? flow.mcToken;
         Logger.debug('Fetched XBL Token', config.debug);
 
         const address = `wss://signal.franchise.minecraft-services.net/ws/v1.0/signaling/${this.networkId}`;
