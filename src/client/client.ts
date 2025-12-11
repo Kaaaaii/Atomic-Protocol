@@ -28,11 +28,11 @@ export class Client extends Connection {
     public networkSettingsRequested = false;
 
     override on<K extends keyof Events>(event: K, listener: Events[K]): this {
-        return super.on(event as any, listener);
+        return super.on(event, listener);
     }
 
     override once<K extends keyof Events>(event: K, listener: Events[K]): this {
-        return super.once(event as any, listener);
+        return super.once(event, listener);
     }
 
     constructor(options: ClientOptions) {

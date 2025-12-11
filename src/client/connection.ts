@@ -5,10 +5,29 @@ import { RaknetClient } from '../rak';
 import { createDecryptor, createEncryptor } from '../transforms/encryption';
 import Framer from '../transforms/framer';
 import { Codec, createDeserializer, createSerializer } from "../transforms/serializer";
-import { clientStatus, CompressionAlgorithm } from '../types';
+import { clientStatus, CompressionAlgorithm, Events } from '../types';
 import { Logger } from "../utils/logger";
 
 export class Connection extends EventEmitter {
+    // Typed event helpers for packet/connection events.
+    on<K extends keyof Events & (string | symbol)>(event: K, listener: Events[K]): this;
+    on(event: string | symbol, listener: (...args: any[]) => void): this;
+    on(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
+
+    once<K extends keyof Events & (string | symbol)>(event: K, listener: Events[K]): this;
+    once(event: string | symbol, listener: (...args: any[]) => void): this;
+    once(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.once(event, listener);
+    }
+
+    emit<K extends keyof Events & (string | symbol)>(event: K, ...args: Parameters<Events[K]>): boolean;
+    emit(event: string | symbol, ...args: any[]): boolean;
+    emit(event: string | symbol, ...args: any[]): boolean {
+        return super.emit(event, ...args);
+    }
+
     public connection!: RaknetClient | NethernetClient;
 
     public encryptionEnabled = false;

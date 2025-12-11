@@ -67,23 +67,3 @@ export enum CompressionAlgorithm {
     Zlib = "zlib",
     Gzip = "gzip"
 }
-
-//Packets
-
-export interface Events {
-    session: () => void;
-    start_game: () => void;
-    connect_allowed: () => void;
-    tick_sync: (packet: any) => void;
-
-    //Packets
-
-    player_list: (packet: any) => void;
-    player_skin: (packet: any) => void;
-    add_player: (packet: any) => void;
-    text: (packet: any) => void;
-    close: () => void;
-    error: () => void;
-    disconnect: () => void;
-    emote: (packet: any) => void;
-}
