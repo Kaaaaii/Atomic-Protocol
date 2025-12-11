@@ -1,7 +1,4 @@
-import { BufferReader } from "../lib/codec/BufferReader";
-import { BufferWriter } from "../lib/codec/BufferWriter";
-import { PacketRegistry } from "../lib/codec/PacketRegistry";
-import "../lib/codec/serializers/register";
+import { BufferReader, BufferWriter, PacketRegistry } from "atomic-codec";
 
 export class Codec {
   createPacketBuffer({ name, params }: { name: string; params: any; }) {

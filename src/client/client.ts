@@ -1,5 +1,5 @@
+import { Events } from "atomic-codec";
 import { config } from "../config/config";
-import { Events } from '../Events';
 import { keyExchange } from "../handshake/keyExchange";
 import login from "../handshake/login";
 import loginVerify from "../handshake/loginVerify";
@@ -28,11 +28,11 @@ export class Client extends Connection {
     public networkSettingsRequested = false;
 
     override on<K extends keyof Events>(event: K, listener: Events[K]): this {
-        return super.on(event, listener);
+        return super.on(event as any, listener);
     }
 
     override once<K extends keyof Events>(event: K, listener: Events[K]): this {
-        return super.once(event, listener);
+        return super.once(event as any, listener);
     }
 
     constructor(options: ClientOptions) {
