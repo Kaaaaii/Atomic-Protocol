@@ -1,12 +1,6 @@
 
 //@ts-ignore
 import { Authflow } from "prismarine-auth";
-import { AddPlayerPacket } from "./packets/packet_add_player";
-import { EmotePacket } from "./packets/packet_emote";
-import { PlayerListPacket } from "./packets/packet_player_list";
-import { PlayerSkinPacket } from "./packets/packet_player_skin";
-import { TextPacket } from "./packets/packet_text";
-import { TickSyncPacket } from "./packets/packet_tick_sync";
 
 //Consts
 
@@ -80,16 +74,16 @@ export interface Events {
     session: () => void;
     start_game: () => void;
     connect_allowed: () => void;
-    tick_sync: (packet: TickSyncPacket) => void;
+    tick_sync: (packet: any) => void;
 
     //Packets
 
-    player_list: (packet: PlayerListPacket) => void;
-    player_skin: (packet: PlayerSkinPacket) => void;
-    add_player: (packet: AddPlayerPacket) => void;
-    text: (packet: TextPacket) => void;
+    player_list: (packet: any) => void;
+    player_skin: (packet: any) => void;
+    add_player: (packet: any) => void;
+    text: (packet: any) => void;
     close: () => void;
     error: () => void;
     disconnect: () => void;
-    emote: (packet: EmotePacket) => void;
+    emote: (packet: any) => void;
 }

@@ -125,8 +125,7 @@ export class Client extends Connection {
     };
 
     public readPacket(packet: any) {
-        if (config.ignoredPackets.includes(packet[0])) return;
-
+        // if (config.ignoredPackets.includes(packet[0])) return;
         const des = this.deserializer.parsePacketBuffer(packet) as unknown as { data: { name: string, params: any; }; };
         const pakData = { name: des.data.name, params: des.data.params };
 
@@ -150,14 +149,6 @@ export class Client extends Connection {
                 break;
             case 'start_game':
                 this.startGameData = pakData.params;
-            case 'item_registry':
-                const shield = pakData.params.itemstates?.find((entry: any) => entry.name === "minecraft:shield");
-                if (shield) {
-                    //@ts-ignore
-                    this.serializer.proto.setVariable('ShieldItemID', shield.runtime_id);
-                    //@ts-ignore
-                    this.deserializer.proto.setVariable('ShieldItemID', shield.runtime_id);
-                }
                 break;
             case 'play_status':
                 if (this.status === clientStatus.Authenticating) {

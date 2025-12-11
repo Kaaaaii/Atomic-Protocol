@@ -4,7 +4,7 @@ import { NethernetClient } from '../nethernet';
 import { RaknetClient } from '../rak';
 import { createDecryptor, createEncryptor } from '../transforms/encryption';
 import Framer from '../transforms/framer';
-import { createDeserializer, createSerializer } from "../transforms/serializer";
+import { Codec, createDeserializer, createSerializer } from "../transforms/serializer";
 import { clientStatus, CompressionAlgorithm } from '../types';
 import { Logger } from "../utils/logger";
 
@@ -29,8 +29,8 @@ export class Connection extends EventEmitter {
     #status = clientStatus.Disconnected;
     sendQ: Buffer[] = [];
     loop!: NodeJS.Timeout;
-    serializer: any;
-    deserializer: any;
+    serializer: Codec;
+    deserializer: Codec;
 
     constructor() {
         super();

@@ -1,46 +1,33 @@
-import { Compiler, FullPacketParser, Serializer } from "protodef";
+import { BufferReader } from "../lib/codec/BufferReader";
+import { BufferWriter } from "../lib/codec/BufferWriter";
+import { PacketRegistry } from "../lib/codec/PacketRegistry";
+import "../lib/codec/serializers/register";
 
-import protocol from "../config/protocol.json";
+export class Codec {
+  createPacketBuffer({ name, params }: { name: string; params: any; }) {
+    const def = PacketRegistry.getByName(name);
+    if (!def) throw new Error(`Unknown packet name: ${name}`);
 
-class Parser extends FullPacketParser {
-    //Not necessary for public use.
-    // verify(deserialized: any, serializer: Serializer) {
-    //     const { name, params } = deserialized.data;
+    const writer = new BufferWriter();
+    writer.writeVarInt(def.id);
+    const packet = def.create(params ?? {});
+    def.serializer.encode(writer, packet);
+    return writer.final();
+  }
 
-    //     const oldBuffer = deserialized.fullBuffer;
-    //     const newBuffer = serializer.createPacketBuffer({ name, params });
-    //     if (!newBuffer.equals(oldBuffer)) {
-    //         console.warn('Failed to re-encode', name);
-    //     }
-    // }
+  parsePacketBuffer(buf: Buffer) {
+    const reader = new BufferReader(buf);
+    const id = reader.readVarInt();
+    const def = PacketRegistry.getById(id);
+
+    if (!def) {
+      return { data: { name: `unknown_${id}`, params: { raw: buf.subarray(reader.position()) } } };
+    }
+
+    const params = def.serializer.decode(reader);
+    return { data: { name: def.name, params } };
+  }
 }
 
-class CustomCompiler extends Compiler.ProtoDefCompiler {
-    public addTypesToCompilePublic(types: any) {
-        this.addTypesToCompile(types);
-    }
-}
-
-let cachedCompiledProto: any = null;
-let cachedSerializer: Serializer | null = null;
-let cachedDeserializer: Parser | null = null;
-
-const getCompiledProto = () => {
-    if (!cachedCompiledProto) {
-        const compiler = new CustomCompiler();
-        compiler.addTypesToCompilePublic(protocol.types);
-        compiler.addTypes(require("../datatypes/compiler").default);
-        cachedCompiledProto = compiler.compileProtoDefSync();
-    }
-    return cachedCompiledProto;
-};
-
-export const createSerializer = () => {
-    if (!cachedSerializer) cachedSerializer = new Serializer(getCompiledProto(), "mcpe_packet");
-    return cachedSerializer;
-};
-
-export const createDeserializer = () => {
-    if (!cachedDeserializer) cachedDeserializer = new Parser(getCompiledProto(), "mcpe_packet");
-    return cachedDeserializer;
-};
+export const createSerializer = () => new Codec();
+export const createDeserializer = () => new Codec();
