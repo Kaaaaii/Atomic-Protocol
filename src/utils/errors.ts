@@ -8,7 +8,8 @@ export type ErrorCode =
     | "INVALID_PROTOCOL"
     | "UNSUPPORTED_PROTOCOL"
     | "CREATION_FAILED"
-    | "INVALID_TOKENS";
+    | "INVALID_TOKENS"
+    | "INVALID_USERNAME"
 
 export class AtomicError extends Error {
     readonly code: ErrorCode;
@@ -45,4 +46,7 @@ export const Errors = {
     noTokens() {
         return new AtomicError("INVALID_TOKENS", "Unable to authenticate. No tokens provided.");
     },
+    invalidUsername() {
+        return new AtomicError("INVALID_USERNAME", "Must provided a valid username.")
+    }
 };

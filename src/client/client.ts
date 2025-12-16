@@ -9,7 +9,7 @@ import { createDeserializer, createSerializer } from "../transforms/serializer";
 import { ClientOptions, clientStatus } from "../types";
 import { Errors } from "../utils/errors";
 import { Logger } from "../utils/logger";
-import { authenticate, AuthenticationType } from "./auth";
+import { authenticate, AuthenticationType, createOfflineSession } from "./auth";
 import { Connection } from "./connection";
 
 export class Client extends Connection {
@@ -61,7 +61,12 @@ export class Client extends Connection {
         if (!this.connection) throw new Error('Connect not currently allowed');
         this.once('session', this._connect);
 
-        authenticate(this, this.options);
+        if (this.options.offline) {
+            Logger.debug("Offline Mode Enabled; Not Authenticating", config.debug);
+            createOfflineSession(this, this.options);
+        } else {
+            authenticate(this, this.options);
+        }
 
         this.sendQ = [];
         this.loop = setInterval(this.onTick, 20);
@@ -95,7 +100,7 @@ export class Client extends Connection {
 
         keyExchange(this);
         login(this, this.options);
-        loginVerify(this);
+        loginVerify(this, this.options);
 
         const host = this.options.host;
         const port = this.options.port;
@@ -125,7 +130,7 @@ export class Client extends Connection {
     };
 
     public readPacket(packet: any) {
-        // if (config.ignoredPackets.includes(packet[0])) return;
+        if (config.ignoredPackets.includes(packet[0])) return;
 
         Logger.debug(`Received Packet: ${packet[0]}`, config.debug);
         const des = this.deserializer.parsePacketBuffer(packet) as unknown as { data: { name: string, params: any; }; };
@@ -216,7 +221,7 @@ export class Client extends Connection {
         this.createClientChain(null, this.options.offline);
 
         // Removed "MC-Data Feature" - Unnecessary Backwards Compatibility
-        const authType = AuthenticationType.Full;
+        const authType = this.options.offline ? AuthenticationType.SelfSigned : AuthenticationType.Full;
         const accessTokens = Array.isArray(this.accessToken) ? this.accessToken : [this.accessToken];
         const chain = [this.clientIdentityChain, ...accessTokens];
 

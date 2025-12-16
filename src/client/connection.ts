@@ -142,7 +142,8 @@ export class Connection extends EventEmitter {
         try {
             this.connection.sendReliable(buffer, immediate);
         } catch (e) {
-            console.error('while sending to', this.connection, e);
+            Logger.debug(`RakNet send failed: ${(e as Error).message}`, config.debug);
+            this.connection?.close();
         };
     };
 

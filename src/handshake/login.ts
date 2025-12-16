@@ -6,13 +6,24 @@ import { ClientOptions, PUBLIC_KEY } from "../types";
 export default (client: any, options: ClientOptions) => {
     const skinData = require("../config/steve.json");
 
-    client.createClientChain = () => {
+    client.createClientChain = (_mojangKey: string | null, offline?: boolean) => {
         const privateKey = client.ecdhKeyPair.privateKey;
 
-        client.clientIdentityChain = sign({
+        const identityPayload = offline ? {
+            extraData: {
+                displayName: client.profile?.name ?? "AtomicOffline",
+                identity: client.profile?.uuid ?? nextUUID(),
+                titleId: "89692877",
+                XUID: String(client.profile?.xuid ?? 0)
+            },
+            certificateAuthority: true,
+            identityPublicKey: client.clientX509
+        } : {
             identityPublicKey: PUBLIC_KEY,
             certificateAuthority: true
-        }, privateKey, {
+        };
+
+        client.clientIdentityChain = sign(identityPayload, privateKey, {
             algorithm: 'ES384',
             header: { x5u: client.clientX509, alg: "ES384" }
         });

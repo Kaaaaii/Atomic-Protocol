@@ -1,10 +1,10 @@
 import * as crypto from "crypto";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { config } from "../config/config";
-import { PUBLIC_KEY } from "../types";
+import { ClientOptions, PUBLIC_KEY } from "../types";
 import { Logger } from "../utils/logger";
 
-export default (client: any) => {
+export default (client: any, options?: ClientOptions) => {
     const getDER = (b64: any) => crypto.createPublicKey({ key: Buffer.from(b64, 'base64'), format: 'der', type: 'spki' });
 
     client.decodeLoginJWT = (authTokens: string[], skinTokens: string) => {
@@ -43,7 +43,7 @@ export default (client: any) => {
             data = { ...data, ...decoded };
         }
 
-        if (!didVerify) client.disconnect('disconnectionScreen.notAuthenticated');
+        if (!didVerify && !options?.offline) client.disconnect('disconnectionScreen.notAuthenticated');
         return { key: finalKey, data };
     }
 };

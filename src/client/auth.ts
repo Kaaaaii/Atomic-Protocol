@@ -4,6 +4,7 @@ import { ClientOptions, Token } from "../types";
 import { Errors } from "../utils/errors";
 import { Logger } from "../utils/logger";
 import { Client } from "./client";
+import { uuidFrom } from "../lib/functions";
 
 export enum AuthenticationType {
     Full = 0,
@@ -92,6 +93,9 @@ interface Profile {
 
 export const authenticate = async (client: Client, options: ClientOptions) => {
     try {
+        if (options.offline) {
+            return createOfflineSession(client, options);
+        }
         const authflow = options.authflow as any;
         const usesAuthflow = typeof authflow?.getMinecraftBedrockToken === "function";
 
@@ -133,7 +137,17 @@ export const authenticate = async (client: Client, options: ClientOptions) => {
     }
 };
 
-function postAuthenticate(client: any, profile: Profile, chains: string) {
+export const createOfflineSession = (client: Client, options: ClientOptions) => {
+    const username = options.username?.trim() || "AtomicOffline";
+    const profile: Profile = {
+        name: username,
+        uuid: uuidFrom(username),
+        xuid: 0
+    };
+    return postAuthenticate(client, profile, []);
+};
+
+function postAuthenticate(client: any, profile: Profile, chains: any) {
     client.profile = profile;
     client.username = profile.name;
     client.accessToken = chains;

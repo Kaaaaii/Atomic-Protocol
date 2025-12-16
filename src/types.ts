@@ -50,6 +50,7 @@ export interface ClientOptions {
     followPort?: boolean;
     viewDistance?: number;
     skipPing?: boolean;
+    offline?: boolean
 
     packets?: string[];
 
