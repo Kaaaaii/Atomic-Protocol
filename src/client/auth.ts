@@ -117,6 +117,9 @@ export const authenticate = async (client: Client, options: ClientOptions) => {
             });
 
             if (!response.ok) throw Errors.noTokens();
+
+            const { chain } = await response.json();
+            chains = chain;
         }
 
         const jwt = chains[1];
