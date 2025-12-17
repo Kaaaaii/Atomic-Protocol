@@ -1,10 +1,9 @@
-import { Authflow } from "prismarine-auth";
 import { config } from "../config/config";
+import { uuidFrom } from "../lib/functions";
 import { ClientOptions, Token } from "../types";
 import { Errors } from "../utils/errors";
 import { Logger } from "../utils/logger";
 import { Client } from "./client";
-import { uuidFrom } from "../lib/functions";
 
 export enum AuthenticationType {
     Full = 0,
@@ -114,7 +113,7 @@ export const authenticate = async (client: Client, options: ClientOptions) => {
                     Authorization: `XBL3.0 x=${authflow.bedrock.userHash};${authflow.bedrock.XSTSToken}`
                 },
                 //@ts-ignore
-                body: JSON.stringify({ clientX509: client.clientX509 })
+                body: JSON.stringify({ identityPublicKey: client.clientX509 })
             });
 
             if (!response.ok) throw Errors.noTokens();
