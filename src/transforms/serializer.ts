@@ -1,4 +1,6 @@
 import { BufferReader, BufferWriter, PacketRegistry } from "atomic-codec";
+// import { BufferReader, BufferWriter, PacketRegistry } from "../../../Atomic-Codec";
+//Debugging Purposes
 
 export class Codec {
   createPacketBuffer({ name, params }: { name: string; params: any; }) {
