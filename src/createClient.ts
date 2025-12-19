@@ -36,6 +36,13 @@ export const createClient = (options: ClientOptions) => {
         ...options
     });
 
+    // Build a per-client `ignoredPackets` list by merging global defaults
+    // with any IDs passed via `options.ignoredPackets`. Do not mutate global config.
+    client.options.ignoredPackets = Array.from(new Set([
+        ...(config.ignoredPackets ?? []),
+        ...(options.ignoredPackets ?? [])
+    ]));
+
     config.debug = options.debug ?? false;
 
     if (options.realmId) realmAuth(client.options).then(onServerInfo).catch((e) => client.emit('error', e));
